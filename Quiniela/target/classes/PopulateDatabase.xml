@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- * PopulateDatabase.xml * * Copyright (C) 2014 Universidad de Sevilla 
+	* * The use of this project is hereby constrained to the conditions of the 
+	* TDG Licence, a copy of which you may download from * http://www.tdg-seville.info/License.html -->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	">
+
+	<!-- User accounts -->
+
+	<bean id="userAccount1" class="security.UserAccount">
+		<property name="username" value="administrator1" />
+		<property name="password" value="d5cee333abe432891a0de57d0ee38713" />
+		<property name="authorities">
+			<list>
+				<bean class="security.Authority">
+					<property name="authority" value="ADMINISTRATOR" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+<!-- 	<bean id="userAccount2" class="security.UserAccount">
+		<property name="username" value="user1" />
+		<property name="password" value="24c9e15e52afc47c225b757e7bee1f9d" />
+		<property name="authorities">
+			<list>
+				<bean class="security.Authority">
+					<property name="authority" value="USER" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="userAccount3" class="security.UserAccount">
+		<property name="username" value="user2" />
+		<property name="password" value="7e58d63b60197ceb55a1c487989a3720" />
+		<property name="authorities">
+			<list>
+				<bean class="security.Authority">
+					<property name="authority" value="USER" />
+				</bean>
+			</list>
+		</property>
+	</bean> -->
+
+
+
+
+	<!-- Administrator -->
+
+
+	<bean id="administrator1" class="domain.Administrator">
+		<property name="userAccount">
+			<ref bean="userAccount1" />
+		</property>
+		<property name="name" value="Luis"></property>
+		<property name="surname" value="Diaz"></property>
+		<property name="emailAddress" value="luidia@gmail.com"></property>
+		<property name="quinielas">
+			<list>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- User -->
+
+	<!-- <bean id="user1" class="domain.User">
+		<property name="userAccount">
+			<ref bean="userAccount2" />
+		</property>
+		<property name="name" value="Luis"></property>
+		<property name="surname" value="Diaz"></property>
+		<property name="emailAddress" value="luidia@gmail.com"></property>
+		<property name="telefono" value="652215478"></property>
+		<property name="quinielas">
+			<list>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="user2" class="domain.User">
+		<property name="userAccount">
+			<ref bean="userAccount3" />
+		</property>
+		<property name="name" value="Adrian"></property>
+		<property name="surname" value="Perez"></property>
+		<property name="emailAddress" value="adri@gmail.com"></property>
+		<property name="telefono" value="652215499"></property>
+		<property name="quinielas">
+			<list>
+			</list>
+		</property>
+	</bean>
+ -->
+
+	<!-- Quiniela -->
+
+<!-- 	<bean id="quiniela1" class="domain.Quiniela">
+		<property name="numAciertos" value="0"></property>
+		<property name="jornada" value="1"></property>
+		<property name="administrator">
+			<ref bean="administrator1" />
+		</property>
+		<property name="user">
+			<ref bean="user1" />
+		</property>
+		<property name="partidos">
+			<list>
+			</list>
+		</property>
+	</bean> -->
+
+
+	<!-- Partido -->
+
+<!-- 	<bean id="partido1" class="domain.Partido">
+		<property name="equipo1" value="Real Madrid"></property>
+		<property name="equipo2" value="Barcelona"></property>
+		<property name="resultado" value="1"></property>
+		<property name="quiniela">
+			<ref bean="quiniela1" />
+		</property>
+
+	</bean> -->
+
+
+</beans>
