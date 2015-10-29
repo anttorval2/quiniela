@@ -1,8 +1,13 @@
 package controllers.Administrator;
 
+import java.awt.Color;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +19,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.lowagie.text.Chunk;
+import com.lowagie.text.Document;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
+
 import controllers.AbstractController;
 import domain.Partido;
 import domain.Quiniela;
+import forms.Prueba;
 import services.PartidoService;
 import services.QuinielaService;
 
@@ -69,7 +82,7 @@ public class PartidoAdministratorController extends AbstractController {
         	}
         }
         result.addObject("quinielaId", quinielaId);
-        if(q.getUser()==null){
+        if(q.getUser()==null && !q.getPartidos().isEmpty() && !partidoService.aciertosHanSidoCalculados(q)){
         	result.addObject("canEdit", true);
         }else{
         	result.addObject("canEdit", false);
@@ -78,6 +91,51 @@ public class PartidoAdministratorController extends AbstractController {
 
         return result;
     }    
+    
+    
+    @RequestMapping(value = "/print", method = RequestMethod.GET)
+    public void print(HttpServletResponse response, @RequestParam int quinielaId) throws IOException {
+        try {
+            Quiniela q  = quinielaService.findOneToEdit(quinielaId);
+            Document document = new Document();
+            response.setHeader("Content-Disposition", "attachment;filename=" + q.getJornada());
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+            document.add(new Chunk(""));
+            Chunk chunkTitle = new Chunk("   "+q.getJornada(), FontFactory.getFont(FontFactory.TIMES_ROMAN, 20,
+                    Font.TIMES_ROMAN, Color.BLACK));
+
+            Paragraph parrafo = new Paragraph();
+            document.add(parrafo);
+            document.add(new Chunk("    ",FontFactory.getFont(FontFactory.COURIER, 14, Font.TIMES_ROMAN, Color.BLACK)));
+            document.add(parrafo);
+            document.add(chunkTitle);
+            document.add(parrafo);
+            document.add(new Chunk("    ",FontFactory.getFont(FontFactory.COURIER, 14, Font.TIMES_ROMAN, Color.BLACK)));
+            document.add(parrafo);
+            int i = 1;
+            for(Partido p: q.getPartidos()){
+            	document.add(new Chunk("  "+i+". "+p.getEquipo1()+" - "+p.getEquipo2()+"   Resultado: "+p.getResultado(), 
+            				FontFactory.getFont(FontFactory.COURIER, 14, Font.TIMES_ROMAN, Color.BLACK)));
+            	document.add(parrafo);
+            	i++;
+            }
+
+            document.add(parrafo);
+            document.add(new Chunk("    ",FontFactory.getFont(FontFactory.COURIER, 14, Font.TIMES_ROMAN, Color.BLACK)));
+            document.add(parrafo);
+            document.add(parrafo);
+            document.add(new Chunk("    ",FontFactory.getFont(FontFactory.COURIER, 14, Font.TIMES_ROMAN, Color.BLACK)));
+            document.add(parrafo);
+            document.add(new Chunk("  "+q.getUser().getUserAccount().getUsername(),FontFactory.getFont(FontFactory.COURIER, 12, Font.TIMES_ROMAN, Color.BLACK)));
+
+            document.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     
     //Calcula los aciertos de cada usuario para una quiniela concreta
     @RequestMapping(value = "/calculo", method = RequestMethod.GET)
@@ -127,20 +185,26 @@ public class PartidoAdministratorController extends AbstractController {
     }
     
     @RequestMapping(value = "/edit", method = RequestMethod.GET)
-    public ModelAndView edit(@RequestParam int partidoId) {
+    public ModelAndView edit(@RequestParam int quinielaId) {
 
         ModelAndView result;
 
-        Partido partido = partidoService.findOneToEdit(partidoId);
-        //Assert.isTrue(partido.getResultado()==null);
-        result = createEditModelAndView(partido);
+        Collection<Partido> partidos = quinielaService.findPartidos(quinielaId);
+        Prueba prueba = new Prueba();
+        List<Partido> l = new ArrayList<Partido>();
+        result = createEditModelAndView2(prueba);
+        for(Partido partido : partidos){
+        	l.add(partido);
+        }
+        prueba.setPrueba(l);
 
-        result.addObject("partido", partido);
+        result.addObject("prueba", prueba);
         result.addObject("isEdit", true);
-        result.addObject("requestURI", "partido/administrator/edit.do?partidoId=" + partidoId);
+        result.addObject("requestURI", "partido/administrator/edit.do?quinielaId=" + quinielaId);
         
         return result;
     }
+    
     
     //Para crear los partidos
     @RequestMapping(value = "/crear", method = RequestMethod.POST, params = "save")
@@ -165,21 +229,23 @@ public class PartidoAdministratorController extends AbstractController {
     
     //Para poner resultados
     @RequestMapping(value = "/edit", method = RequestMethod.POST, params = "save")
-    public ModelAndView save2(@Valid Partido partido, BindingResult binding) {
+    public ModelAndView save2(@Valid Prueba p, BindingResult binding) {
 
         ModelAndView result;
-
+        
         if (binding.hasErrors()) {
-            result = createEditModelAndView(partido);
+            result = createEditModelAndView2(p);
         } else {
             try {
-            	partidoService.save2(partido);
-                result = new ModelAndView("redirect:list.do?quinielaId="+partido.getQuiniela().getId());
+            	for(Partido partido: p.getPrueba()){
+            		partidoService.save2(partido);
+            	}
+            	
+                result = new ModelAndView("redirect:list.do?quinielaId="+p.getPrueba().get(0).getQuiniela().getId());
             } catch (Throwable oops) {
-                result = createEditModelAndView(partido, "partido.commit.error");
+                result = createEditModelAndView2(p, "partido.commit.error");
             }
         }
-
         return result;
 
     }
@@ -208,6 +274,30 @@ public class PartidoAdministratorController extends AbstractController {
         }
 
         result.addObject("partido", partido);
+        result.addObject("message", message);
+
+
+        return result;
+    }
+    
+    protected ModelAndView createEditModelAndView2(Prueba p) {
+        assert p != null;
+        ModelAndView result;
+
+        result = createEditModelAndView2(p, null);
+
+        return result;
+    }
+
+    protected ModelAndView createEditModelAndView2(Prueba p, String message) {
+
+        Assert.notNull(p);
+        ModelAndView result;
+
+        result = new ModelAndView("partido/edit");
+
+        result.addObject("isEdit", true);
+        result.addObject("prueba", p);
         result.addObject("message", message);
 
 

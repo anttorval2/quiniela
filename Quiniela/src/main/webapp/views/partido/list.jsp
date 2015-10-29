@@ -27,26 +27,23 @@
 		<display:column property="resultado" title="${resultado}"
 			sortable="${true}" />
 
-		<security:authorize access="hasRole('ADMINISTRATOR')">
+		<%-- 		<security:authorize access="hasRole('ADMINISTRATOR')">
 			<jstl:if test="${canEdit==true}">
 				<display:column>
 					<a href="partido/administrator/edit.do?partidoId=${row.id}"><spring:message
 							code="partido.edit" /></a>
 				</display:column>
 			</jstl:if>
-		</security:authorize>
+		</security:authorize> --%>
 
-		<security:authorize access="hasRole('USER')">
+		<%-- 		<security:authorize access="hasRole('USER')">
 			<jstl:if test="${canEdit==true}">
 				<display:column>
 					<a href="partido/user/edit.do?partidoId=${row.id}"><spring:message
 							code="partido.edit" /></a>
 				</display:column>
 			</jstl:if>
-
-
-
-		</security:authorize>
+		</security:authorize> --%>
 
 
 	</display:table>
@@ -62,36 +59,76 @@
 </div>
 
 
+<security:authorize access="hasRole('USER')">
+	<jstl:if test="${canEdit==true}">
+		<br />
+		<br />
+		<div class="col-md-3  col-md-offset-4">
+			<jstl:if test="${canEdit==true}">
+				<div class="row">
+					<a href="partido/user/edit.do?quinielaId=${quinielaId}">
+						<button type="button" class="btn btn-default btn-lg btn-block">
+							<spring:message code="partido.crearPronosticos" />
+						</button>
+					</a>
+				</div>
+				<br>
+			</jstl:if>
+		</div>
+	</jstl:if>
+</security:authorize>
+
 <security:authorize access="hasRole('ADMINISTRATOR')">
-<br />
-<br />
-<div class="col-md-3  col-md-offset-4">
-	<jstl:if test="${canCreate==true}">
+	<br />
+	<br />
+	<div class="col-md-3  col-md-offset-4">
 		<div class="row">
-			<a href="partido/administrator/crear.do?quinielaId=${quinielaId}">
+			<a href="partido/administrator/print.do?quinielaId=${quinielaId}">
 				<button type="button" class="btn btn-default btn-lg btn-block">
-					<spring:message code="partido.crear" />
+					<spring:message code="partido.pdf" />
 				</button>
 			</a>
 		</div>
-		<br>
-	</jstl:if>
-	<jstl:if test="${canCalcularAciertos==true}">
-		<div class="row">
-			<a href="partido/administrator/calculo.do?quinielaId=${quinielaId}">
-				<button type="button" class="btn btn-default btn-lg btn-block">
-					<spring:message code="partido.calcularAciertos" />
-				</button>
-			</a>
-		</div>
-	</jstl:if>
-</div>
+		<br/>
+		<jstl:if test="${canEdit==true}">
+			<div class="row">
+				<a href="partido/administrator/edit.do?quinielaId=${quinielaId}">
+					<button type="button" class="btn btn-default btn-lg btn-block">
+						<spring:message code="partido.crearPronosticos" />
+					</button>
+				</a>
+			</div>
+			<br>
+		</jstl:if>
+		<jstl:if test="${canCreate==true}">
+			<div class="row">
+				<a href="partido/administrator/crear.do?quinielaId=${quinielaId}">
+					<button type="button" class="btn btn-default btn-lg btn-block">
+						<spring:message code="partido.crear" />
+					</button>
+				</a>
+			</div>
+			<br>
+		</jstl:if>
+		<jstl:if test="${canCalcularAciertos==true}">
+			<div class="row">
+				<a href="partido/administrator/calculo.do?quinielaId=${quinielaId}">
+					<button type="button" class="btn btn-default btn-lg btn-block">
+						<spring:message code="partido.calcularAciertos" />
+					</button>
+				</a>
+			</div>
+		</jstl:if>
+	</div>
 
 </security:authorize>
 <jstl:if test="${mostrarMensaje==true}">
-
-	<h3><spring:message code="partido.mensaje" /> &nbsp; ${ganador}</h3>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<h3>
+		<spring:message code="partido.mensaje" />
+		&nbsp; ${ganador}
+	</h3>
 </jstl:if>
-<%-- <jstl:if test="${mostrarMensajeError==true}">
-<spring:message code="partido.mensajeError" />
-</jstl:if> --%>

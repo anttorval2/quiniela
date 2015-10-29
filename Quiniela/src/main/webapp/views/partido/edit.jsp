@@ -15,57 +15,68 @@
 	<br /> <br />
 
 	<security:authorize access="hasRole('ADMINISTRATOR')">
-	
-		<form:form action="${requestURI}" modelAttribute="partido">
+		<jstl:if test="${isEdit==false}">
+			<form:form action="${requestURI}" modelAttribute="partido">
 
+				<form:hidden path="id" />
+				<form:hidden path="version" />
+				<form:hidden path="quiniela" />
 
-			<form:hidden path="id" />
-			<form:hidden path="version" />
-			<form:hidden path="quiniela" />
+				<div class="col-md-7  col-md-offset-1" style="margin-bottom: 20%;">
+					<acme:textbox code="partido.equipo1" path="equipo1" />
+					<acme:textbox code="partido.equipo2" path="equipo2" />
 
-			<jstl:if test="${isEdit==false}">
-			<div class="col-md-7  col-md-offset-1" style="margin-bottom: 20%;">
-				<acme:textbox code="partido.equipo1" path="equipo1" />
-				<acme:textbox code="partido.equipo2" path="equipo2" />
-				
-				<acme:submit code="partido.save" name="save" />
+					<acme:submit code="partido.save" name="save" />
 				</div>
-			</jstl:if>
-			<jstl:if test="${isEdit==true}">
-				<form:hidden path="equipo1" />
-				<form:hidden path="equipo2" />
-				<div class="col-lg-8 col-md-8 col-sm-8 mb">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="centered">
-							<b>${partido.equipo1} - ${partido.equipo2}</b>
-						</h3>
-					</div>
-					<div class="panel-body centered" >
-				<h4>
+			</form:form>
+		</jstl:if>
 
-					<form:radiobutton path="resultado" value="1" />
-					1   &nbsp;&nbsp;
-					<form:radiobutton path="resultado" value="X" />
-					X    &nbsp;&nbsp;
-					<form:radiobutton path="resultado" value="2" />
-					2    &nbsp;&nbsp;
-				</h4>
-				<acme:submit code="partido.save" name="save" />
+
+		<jstl:if test="${isEdit==true}">
+			<form:form action="${requestURI}" modelAttribute="prueba">
+				<jstl:forEach items="${prueba.prueba}" var="partido"
+					varStatus="loop">
+					<form:hidden path="prueba[${loop.index}].id" />
+					<form:hidden path="prueba[${loop.index}].version" />
+					<form:hidden path="prueba[${loop.index}].quiniela" />
+					<form:hidden path="prueba[${loop.index}].equipo1" />
+					<form:hidden path="prueba[${loop.index}].equipo2" />
+					<div class="col-lg-8 col-md-8 col-sm-8 mb">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="centered">
+									<b>${partido.equipo1} - ${partido.equipo2}</b>
+								</h3>
+							</div>
+							<div class="panel-body centered">
+								<h4>
+									<form:radiobutton path="prueba[${loop.index}].resultado"
+										value="1" />
+									1 &nbsp;&nbsp;
+									<form:radiobutton path="prueba[${loop.index}].resultado"
+										value="X" />
+									X &nbsp;&nbsp;
+									<form:radiobutton path="prueba[${loop.index}].resultado"
+										value="2" />
+									2 &nbsp;&nbsp;
+								</h4>
+							</div>
+						</div>
 					</div>
+				</jstl:forEach>
+				<div class="col-lg-8 col-md-8 col-sm-8 mb centered">
+					<acme:submit code="partido.save" name="save" />
 				</div>
-			</div>
-			</jstl:if>
 
-			
+			</form:form>
+		</jstl:if>
 
-		</form:form>
 	</security:authorize>
 
 
 	<security:authorize access="hasRole('USER')">
 		<jstl:if test="${isEdit==true}">
-			<form:form action="${requestURI}" modelAttribute="partido">
+			<%-- 			<form:form action="${requestURI}" modelAttribute="partido">
 
 
 				<form:hidden path="id" />
@@ -74,64 +85,64 @@
 				<form:hidden path="equipo1" />
 				<form:hidden path="equipo2" />
 
-
-<%-- <h3>${partido.equipo1} - ${partido.equipo2} : <br></h3>
-				<h4>
-					<form:label path="resultado">
-
-						<spring:message code="partido.resultado2" /> &nbsp;&nbsp;
-
-					</form:label>
-					<form:radiobutton path="resultado" value="1" />
-					1   &nbsp;&nbsp;
-					<form:radiobutton path="resultado" value="X" />
-					X    &nbsp;&nbsp;
-					<form:radiobutton path="resultado" value="2" />
-					2    &nbsp;&nbsp;
-				</h4> --%>
-				
-				
-				
-				
-				
-				
-				
 				<div class="col-lg-8 col-md-8 col-sm-8 mb">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="centered">
-							<b>${partido.equipo1} - ${partido.equipo2}</b>
-						</h3>
-					</div>
-					<div class="panel-body centered" >
-				<h4>
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="centered">
+								<b>${partido.equipo1} - ${partido.equipo2}</b>
+							</h3>
+						</div>
+						<div class="panel-body centered">
+							<h4>
 
-					<form:radiobutton path="resultado" value="1" />
-					1   &nbsp;&nbsp;
-					<form:radiobutton path="resultado" value="X" />
-					X    &nbsp;&nbsp;
-					<form:radiobutton path="resultado" value="2" />
-					2    &nbsp;&nbsp;
-				</h4>
-				<acme:submit code="partido.save" name="save" />
+								<form:radiobutton path="resultado" value="1" />
+								1 &nbsp;&nbsp;
+								<form:radiobutton path="resultado" value="X" />
+								X &nbsp;&nbsp;
+								<form:radiobutton path="resultado" value="2" />
+								2 &nbsp;&nbsp;
+							</h4>
+							<acme:submit code="partido.save" name="save" />
+						</div>
 					</div>
 				</div>
-			</div>
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
 
-				
+			</form:form> --%>
+
+			<form:form action="${requestURI}" modelAttribute="prueba">
+				<jstl:forEach items="${prueba.prueba}" var="partido"
+					varStatus="loop">
+					<form:hidden path="prueba[${loop.index}].id" />
+					<form:hidden path="prueba[${loop.index}].version" />
+					<form:hidden path="prueba[${loop.index}].quiniela" />
+					<form:hidden path="prueba[${loop.index}].equipo1" />
+					<form:hidden path="prueba[${loop.index}].equipo2" />
+					<div class="col-lg-8 col-md-8 col-sm-8 mb">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="centered">
+									<b>${partido.equipo1} - ${partido.equipo2}</b>
+								</h3>
+							</div>
+							<div class="panel-body centered">
+								<h4>
+									<form:radiobutton path="prueba[${loop.index}].resultado"
+										value="1" />
+									1 &nbsp;&nbsp;
+									<form:radiobutton path="prueba[${loop.index}].resultado"
+										value="X" />
+									X &nbsp;&nbsp;
+									<form:radiobutton path="prueba[${loop.index}].resultado"
+										value="2" />
+									2 &nbsp;&nbsp;
+								</h4>
+							</div>
+						</div>
+					</div>
+				</jstl:forEach>
+				<div class="col-lg-8 col-md-8 col-sm-8 mb centered">
+					<acme:submit code="partido.save" name="save" />
+				</div>
 
 			</form:form>
 		</jstl:if>

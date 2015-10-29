@@ -101,6 +101,20 @@ public class PartidoService {
 		
 		return res;
 	}
+	
+	public boolean usuarioPuedeIntroducirPronostico2(Quiniela q) {
+		User user = userService.findByPrincipal();
+		Assert.isTrue(user.equals(q.getUser()));
+		Date currentDate = new Date();
+		boolean res = false;
+		
+		if(q.getFechaLimite().after(currentDate) || 
+		   q.getFechaLimite().equals(currentDate)){
+			res = true;
+		}
+		
+		return res;
+	}
 
 
 	public boolean todosLosResultadosEstanPuestos(Quiniela q) {

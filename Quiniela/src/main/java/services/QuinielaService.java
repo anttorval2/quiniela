@@ -65,6 +65,8 @@ public class QuinielaService {
 	}
 
 	public void save(Quiniela quiniela) {
+		
+		Assert.isTrue(quiniela.getFechaLimite().after(new Date()));
 
 		Collection<User> usuarios = userService.findAll();
 		Administrator admin = administratorService.findByPrincipal();

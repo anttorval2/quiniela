@@ -1,6 +1,8 @@
 package controllers.User;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -16,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import controllers.AbstractController;
 import domain.Partido;
 import domain.Quiniela;
+import forms.Prueba;
 import services.PartidoService;
 import services.QuinielaService;
 
@@ -74,56 +77,64 @@ public class PartidoUserController extends AbstractController {
     
 
     @RequestMapping(value = "/edit", method = RequestMethod.GET)
-    public ModelAndView edit(@RequestParam int partidoId) {
+    public ModelAndView edit(@RequestParam int quinielaId) {
 
         ModelAndView result;
+        Quiniela q = quinielaService.findOneToEdit(quinielaId);
+        Collection<Partido> partidos = quinielaService.findPartidos(quinielaId);
+        Prueba prueba = new Prueba();
+        List<Partido> l = new ArrayList<Partido>();
+        for(Partido partido : partidos){
+        	l.add(partido);
+        }
+        prueba.setPrueba(l);
+        result = createEditModelAndView2(prueba);
 
-        Partido partido = partidoService.findOneToEdit(partidoId);
-        result = createEditModelAndView(partido);
-
-        result.addObject("partido", partido);
-        if(partidoService.usuarioPuedeIntroducirPronostico(partido)){
+        result.addObject("prueba", prueba);
+        if(partidoService.usuarioPuedeIntroducirPronostico2(q)){
             result.addObject("isEdit", true);
 
         }
-        result.addObject("requestURI", "partido/user/edit.do?partidoId=" + partidoId);
+        result.addObject("requestURI", "partido/user/edit.do?quinielaId=" + quinielaId);
         
         return result;
     }
     
-    @RequestMapping(value = "/crear", method = RequestMethod.POST, params = "save")
-    public ModelAndView save(@Valid Partido partido, BindingResult binding) {
-
-        ModelAndView result;
-
-        if (binding.hasErrors()) {
-            result = createEditModelAndView(partido);
-        } else {
-            try {
-            	partidoService.save3(partido);
-                result = new ModelAndView("redirect:list.do?quinielaId="+partido.getQuiniela().getId());
-            } catch (Throwable oops) {
-                result = createEditModelAndView(partido, "partido.commit.error");
-            }
-        }
-
-        return result;
-
-    }
+//    @RequestMapping(value = "/crear", method = RequestMethod.POST, params = "save")
+//    public ModelAndView save(@Valid Partido partido, BindingResult binding) {
+//
+//        ModelAndView result;
+//
+//        if (binding.hasErrors()) {
+//            result = createEditModelAndView(partido);
+//        } else {
+//            try {
+//            	partidoService.save3(partido);
+//                result = new ModelAndView("redirect:list.do?quinielaId="+partido.getQuiniela().getId());
+//            } catch (Throwable oops) {
+//                result = createEditModelAndView(partido, "partido.commit.error");
+//            }
+//        }
+//
+//        return result;
+//
+//    }
     
     @RequestMapping(value = "/edit", method = RequestMethod.POST, params = "save")
-    public ModelAndView save2(@Valid Partido partido, BindingResult binding) {
+    public ModelAndView save2(@Valid Prueba p, BindingResult binding) {
 
         ModelAndView result;
 
         if (binding.hasErrors()) {
-            result = createEditModelAndView(partido);
+            result = createEditModelAndView2(p);
         } else {
             try {
-            	partidoService.save2(partido);
-                result = new ModelAndView("redirect:list.do?quinielaId="+partido.getQuiniela().getId());
+            	for(Partido partido: p.getPrueba()){
+            		partidoService.save2(partido);
+            	}
+                result = new ModelAndView("redirect:list.do?quinielaId="+p.getPrueba().get(0).getQuiniela().getId());
             } catch (Throwable oops) {
-                result = createEditModelAndView(partido, "partido.commit.error");
+                result = createEditModelAndView2(p, "partido.commit.error");
             }
         }
 
@@ -155,6 +166,34 @@ public class PartidoUserController extends AbstractController {
         }
 
         result.addObject("partido", partido);
+        result.addObject("message", message);
+
+
+        return result;
+    }
+    
+    protected ModelAndView createEditModelAndView2(Prueba p) {
+        assert p != null;
+        ModelAndView result;
+
+        result = createEditModelAndView2(p, null);
+
+        return result;
+    }
+
+    protected ModelAndView createEditModelAndView2(Prueba p, String message) {
+
+        Assert.notNull(p);
+        ModelAndView result;
+
+        result = new ModelAndView("partido/edit");
+        
+        if(!p.getPrueba().isEmpty() && partidoService.usuarioPuedeIntroducirPronostico2(p.getPrueba().get(0).getQuiniela())){
+            result.addObject("isEdit", true);
+        }else{
+        	result.addObject("isEdit", false);
+        }
+        result.addObject("prueba", p);
         result.addObject("message", message);
 
 

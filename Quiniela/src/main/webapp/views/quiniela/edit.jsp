@@ -25,7 +25,7 @@
 
 
 		<acme:textbox code="quiniela.jornada" path="jornada" />
-		<acme:textbox code="quiniela.fechaLimite" path="fechaLimite" />
+		<acme:textbox code="quiniela.fechaLimite" path="fechaLimite" placeholder="dd/mm/yy"/>
 
 		<acme:submit code="quiniela.save" name="save" />
 
