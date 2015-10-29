@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import controllers.AbstractController;
 import domain.Partido;
 import domain.Quiniela;
 import forms.Prueba;
+import services.MailService;
 import services.PartidoService;
 import services.QuinielaService;
 
@@ -33,6 +35,9 @@ public class PartidoUserController extends AbstractController {
     
     @Autowired
     private PartidoService partidoService;
+    
+	@Resource
+	private MailService mailService;
   
 
 
@@ -96,30 +101,12 @@ public class PartidoUserController extends AbstractController {
 
         }
         result.addObject("requestURI", "partido/user/edit.do?quinielaId=" + quinielaId);
+              
         
         return result;
     }
     
-//    @RequestMapping(value = "/crear", method = RequestMethod.POST, params = "save")
-//    public ModelAndView save(@Valid Partido partido, BindingResult binding) {
-//
-//        ModelAndView result;
-//
-//        if (binding.hasErrors()) {
-//            result = createEditModelAndView(partido);
-//        } else {
-//            try {
-//            	partidoService.save3(partido);
-//                result = new ModelAndView("redirect:list.do?quinielaId="+partido.getQuiniela().getId());
-//            } catch (Throwable oops) {
-//                result = createEditModelAndView(partido, "partido.commit.error");
-//            }
-//        }
-//
-//        return result;
-//
-//    }
-    
+   
     @RequestMapping(value = "/edit", method = RequestMethod.POST, params = "save")
     public ModelAndView save2(@Valid Prueba p, BindingResult binding) {
 
@@ -129,9 +116,18 @@ public class PartidoUserController extends AbstractController {
             result = createEditModelAndView2(p);
         } else {
             try {
+            	String contenidoCorreo = "Tus pronósticos para "+p.getPrueba().get(0).getQuiniela().getJornada()+": \n";
+            	int i = 1;
             	for(Partido partido: p.getPrueba()){
+            		contenidoCorreo += "\n"+String.valueOf(i)+". "+ partido.getEquipo1()+" - "+
+            							partido.getEquipo2()+". Resultado: "+ partido.getResultado();
             		partidoService.save2(partido);
+            		i++;
             	}
+                //Envio de correo
+            	mailService.send(p.getPrueba().get(0).getQuiniela().getUser().getEmailAddress(), 
+            					"Tus pronósticos para "+p.getPrueba().get(0).getQuiniela().getJornada(), contenidoCorreo);
+            	
                 result = new ModelAndView("redirect:list.do?quinielaId="+p.getPrueba().get(0).getQuiniela().getId());
             } catch (Throwable oops) {
                 result = createEditModelAndView2(p, "partido.commit.error");

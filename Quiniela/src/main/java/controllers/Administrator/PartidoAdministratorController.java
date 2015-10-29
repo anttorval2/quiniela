@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -30,6 +31,7 @@ import controllers.AbstractController;
 import domain.Partido;
 import domain.Quiniela;
 import forms.Prueba;
+import services.MailService;
 import services.PartidoService;
 import services.QuinielaService;
 
@@ -44,7 +46,9 @@ public class PartidoAdministratorController extends AbstractController {
     
     @Autowired
     private PartidoService partidoService;
-  
+    
+	@Resource
+	private MailService mailService;  
 
 
     // Constructors -----------------------------------------------------------
@@ -148,18 +152,45 @@ public class PartidoAdministratorController extends AbstractController {
         Collection<Partido> partidos = quinielaService.findPartidos(quinielaId);
         
 		Date currentMoment = new Date();
+		String ganador = "";
 		if(q.getFechaLimite().before(currentMoment)){
 			 quinielaService.calcularAciertos(q);
-			 String ganador = partidoService.getGanador(q);
+			 ganador = partidoService.getGanador(q);
 			 result.addObject("mostrarMensaje", true);
 			 result.addObject("ganador", ganador);
 
 			 
 		}       
+		int pos=ganador.indexOf(' ');
+		String ganadorModificado = "";
+		if(pos != -1){
+			ganadorModificado = ganador.substring(0, pos);
+		}else{
+			ganadorModificado = ganador;
+		}
+		Quiniela quinielaGanador = quinielaService.findQuinielaForUsernameAndJornada(ganadorModificado,q.getJornada());
+
 		result.addObject("quinielaId", quinielaId);
 		result.addObject("partidos", partidos);
         
         result.addObject("requestURI", "partido/administrator/list.do?quinielaId="+quinielaId);
+        
+        //Enviar correos
+        Collection<Quiniela> quinielas = quinielaService.findQuinielasByJornada(q.getJornada());
+        
+		for(Quiniela we: quinielas){
+			if(we.getUser() == null){
+				quinielas.remove(we);
+				break;
+			}
+		}
+		
+        for(Quiniela qui: quinielas){
+        	mailService.send(qui.getUser().getEmailAddress(), "Ganador de "+qui.getJornada(), 
+    				"El ganador de "+qui.getJornada()+" ha sido "+ganador+" con "+quinielaGanador.getNumAciertos()+" aciertos.\n"
+    						+ "Tus aciertos: "+qui.getNumAciertos());
+        }
+
 
         return result;
     }

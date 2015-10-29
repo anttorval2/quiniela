@@ -220,7 +220,7 @@ CREATE TABLE `UserAccount` (
 
 LOCK TABLES `UserAccount` WRITE;
 /*!40000 ALTER TABLE `UserAccount` DISABLE KEYS */;
-INSERT INTO `UserAccount` VALUES ('d5cee333abe432891a0de57d0ee38713','administrator1',1);
+INSERT INTO `UserAccount` VALUES ('25151b2a5f3d138eb8c6b1408c52b4f2','foriinformatica',1);
 /*!40000 ALTER TABLE `UserAccount` ENABLE KEYS */;
 UNLOCK TABLES;
 

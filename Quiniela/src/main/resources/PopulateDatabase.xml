@@ -14,8 +14,8 @@
 	<!-- User accounts -->
 
 	<bean id="userAccount1" class="security.UserAccount">
-		<property name="username" value="administrator1" />
-		<property name="password" value="d5cee333abe432891a0de57d0ee38713" />
+		<property name="username" value="foriinformatica" />
+		<property name="password" value="25151b2a5f3d138eb8c6b1408c52b4f2" />
 		<property name="authorities">
 			<list>
 				<bean class="security.Authority">

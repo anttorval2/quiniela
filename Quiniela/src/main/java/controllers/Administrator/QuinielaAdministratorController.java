@@ -2,6 +2,7 @@ package controllers.Administrator;
 
 import java.util.Collection;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import controllers.AbstractController;
 import domain.Quiniela;
 import domain.User;
+import services.MailService;
 import services.QuinielaService;
 import services.UserService;
 
@@ -31,6 +33,9 @@ public class QuinielaAdministratorController extends AbstractController {
     @Autowired
     private UserService userService;
 
+	@Resource
+	private MailService mailService;
+	
     // Constructors -----------------------------------------------------------
 
     public QuinielaAdministratorController() {

@@ -141,4 +141,8 @@ public class QuinielaService {
 		}
 	}
 
+	public Quiniela findQuinielaForUsernameAndJornada(String ganador, String jornada) {
+		return quinielaRepository.findQuinielaForUsernameAndJornada(ganador, jornada);
+	}
+
 }

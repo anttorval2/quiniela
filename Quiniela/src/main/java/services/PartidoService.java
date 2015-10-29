@@ -3,6 +3,8 @@ package services;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.annotation.Resource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import repositories.PartidoRepository;
 public class PartidoService {
 
     // Managed repository ---------------------------------------
+	
 
     @Autowired
     private PartidoRepository partidoRepository;

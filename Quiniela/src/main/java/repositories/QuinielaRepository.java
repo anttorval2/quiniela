@@ -24,6 +24,9 @@ public interface QuinielaRepository extends JpaRepository<Quiniela, Integer> {
     @Query("select q from Quiniela q where q.jornada=?1")
 	Collection<Quiniela> findQuinielasByJornada(String jornada);
 
+    @Query("select q from Quiniela q where q.user.userAccount.username=?1 and q.jornada=?2")
+	Quiniela findQuinielaForUsernameAndJornada(String ganador, String jornada);
+
 
 
 

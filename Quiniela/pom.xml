@@ -333,6 +333,25 @@
 			<version>2.4.4</version>
 		</dependency>
 
+		<!-- Dependencias para enviar emails -->
+	<!-- para poder hacer uso de la anotación @Resource con la jdk1.5 -->
+<!-- 		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
+		</dependency> -->
+		<!-- ========== Mail ========== -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+		    <groupId>javax.activation</groupId>
+		    <artifactId>activation</artifactId>
+		    <version>1.1</version>
+		</dependency>
+
 	</dependencies>
 
 </project> 
