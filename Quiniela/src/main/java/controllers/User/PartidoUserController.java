@@ -55,6 +55,14 @@ public class PartidoUserController extends AbstractController {
         ModelAndView result;
         Collection<Partido> partidos = quinielaService.findPartidos(quinielaId);
         Quiniela q = quinielaService.findOneToEdit(quinielaId);
+        
+        Boolean tienePronosticos = false;
+        for(Partido part : partidos){
+        	if(part.getResultado() != null){
+        		tienePronosticos = true;
+        		break;
+        	}
+        }
 
         result = new ModelAndView("partido/list");
         
@@ -75,6 +83,11 @@ public class PartidoUserController extends AbstractController {
         }else{
         	result.addObject("canEdit", false);
         }
+        if(!tienePronosticos){
+        	result.addObject("sinPronosticosAun", true);
+        }else{
+        	result.addObject("sinPronosticosAun", false);
+        }
         result.addObject("requestURI", "partido/user/list.do?quinielaId="+quinielaId);
 
         return result;
@@ -87,6 +100,12 @@ public class PartidoUserController extends AbstractController {
         ModelAndView result;
         Quiniela q = quinielaService.findOneToEdit(quinielaId);
         Collection<Partido> partidos = quinielaService.findPartidos(quinielaId);
+        
+        //Para controlar que solo se puedan meter los pronosticos una vez
+        for(Partido part: partidos){
+        	Assert.isTrue(part.getResultado() == null);
+        }
+        
         Prueba prueba = new Prueba();
         List<Partido> l = new ArrayList<Partido>();
         for(Partido partido : partidos){
@@ -111,11 +130,15 @@ public class PartidoUserController extends AbstractController {
     public ModelAndView save2(@Valid Prueba p, BindingResult binding) {
 
         ModelAndView result;
+        
+        
 
         if (binding.hasErrors()) {
             result = createEditModelAndView2(p);
         } else {
             try {
+            	quinielaService.compruebaQueLaQuinielaEstaHabilitada(p.getPrueba().get(0).getQuiniela());
+            	quinielaService.compruebaQueLaQuinielaEsDelUsuarioConectado(p.getPrueba().get(0).getQuiniela());
             	String contenidoCorreo = "Tus pronósticos para "+p.getPrueba().get(0).getQuiniela().getJornada()+": \n";
             	int i = 1;
             	for(Partido partido: p.getPrueba()){
@@ -130,7 +153,7 @@ public class PartidoUserController extends AbstractController {
             	
                 result = new ModelAndView("redirect:list.do?quinielaId="+p.getPrueba().get(0).getQuiniela().getId());
             } catch (Throwable oops) {
-                result = createEditModelAndView2(p, "partido.commit.error");
+                result = createEditModelAndView2(p, "partido.commit.error2");
             }
         }
 

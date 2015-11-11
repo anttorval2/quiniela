@@ -18,7 +18,7 @@
  </div>
  <!--logo start-->
 
- <a href="#" class="logo"><img src="images/Apple-iconnaranja.png"  width="30" style="vertical-align=text-bottom;">    <b>&nbsp; La&nbsp; <b style="color:orange">Quiniela</b></b></a>
+ <a href="#" class="logo"><img src="images/Apple-iconnaranja.png"  width="30" style="vertical-align=text-bottom;">    <b>&nbsp; Fori&nbsp; <b style="color:orange">Apuestas</b></b></a>
  <!--logo end-->
  <div class="nav notify-row" id="top_menu">
  
@@ -45,7 +45,8 @@
 
     <li style="margin-top: 15px; margin-right: 15px;">
      <div class="btn-group ">
-     <button type="button" class="btn btn-default"><a href="security/login.do"><spring:message code="master.page.login" /></a></button>
+<%--      <button type="button" class="btn btn-default"><a href="security/login.do"><spring:message code="master.page.login" /></a></button>
+ --%>     <a href="security/login.do" class="btn btn-default" role="button">Entrar</a>
 <%--       <button type="button" class="btn btn-theme dropdown-toggle" data-toggle="dropdown">
        <i class="fa fa-sign-out"></i> <span class="caret"></span>
       </button>

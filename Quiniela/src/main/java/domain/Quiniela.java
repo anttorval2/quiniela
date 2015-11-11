@@ -25,10 +25,10 @@ public class Quiniela extends DomainEntity{
 	private String jornada;
 	private Integer numAciertos;
 	private Date fechaLimite;
+	private boolean isValid;
 	
 	
 	@NotBlank
-	//@Column(unique = true)
 	public String getJornada() {
 		return jornada;
 	}
@@ -56,8 +56,17 @@ public class Quiniela extends DomainEntity{
 		this.fechaLimite = fechaLimite;
 	}
 	
+	public boolean isValid() {
+		return isValid;
+	}
+
+	public void setValid(boolean isValid) {
+		this.isValid = isValid;
+	}
+	
 	
 	//RelationShips............................................
+
 
 
 	private Collection<Partido> partidos;

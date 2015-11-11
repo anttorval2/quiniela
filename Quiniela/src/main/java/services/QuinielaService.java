@@ -14,6 +14,7 @@ import domain.Partido;
 import domain.Quiniela;
 import domain.User;
 import repositories.QuinielaRepository;
+import security.Authority;
 
 @Service
 @Transactional
@@ -58,7 +59,6 @@ public class QuinielaService {
 		Collection<Partido> partidos = new ArrayList<Partido>();
 		Administrator admin = administratorService.findByPrincipal();
 		result.setAdministrator(admin);
-
 		result.setPartidos(partidos);
 
 		return result;
@@ -66,19 +66,30 @@ public class QuinielaService {
 
 	public void save(Quiniela quiniela) {
 		
+		String soyAdministrador = "";
+		Administrator admin = administratorService.findByPrincipal();
+		Collection<Authority> autoridades = admin.getUserAccount().getAuthorities();
+		for(Authority a: autoridades){
+			soyAdministrador = a.getAuthority();
+		}
+		Assert.isTrue(soyAdministrador.equals("ADMINISTRATOR"));
+		
+		
 		Assert.isTrue(quiniela.getFechaLimite().after(new Date()));
 
 		Collection<User> usuarios = userService.findAll();
-		Administrator admin = administratorService.findByPrincipal();
+		//Administrator admin = administratorService.findByPrincipal();
 		quiniela.setAdministrator(admin);
 
 		for (User u : usuarios) {
 			quiniela.setUser(u);
+			quiniela.setValid(false);
 			quinielaRepository.save(quiniela);
 
 		}
 
 		quiniela.setUser(null);
+		quiniela.setValid(true);
 		quinielaRepository.save(quiniela);
 
 	}
@@ -102,6 +113,15 @@ public class QuinielaService {
 	}
 
 	public boolean sePuedeApostar(Quiniela q) {
+		
+//		String soyAdministrador = "";
+//		Administrator admin = administratorService.findByPrincipal();
+//		Collection<Authority> autoridades = admin.getUserAccount().getAuthorities();
+//		for(Authority a: autoridades){
+//			soyAdministrador = a.getAuthority();
+//		}
+//		Assert.isTrue(soyAdministrador.equals("ADMINISTRATOR"));
+		
 		boolean res = false;
 		Date fechaActuarl = new Date();
 		if (q.getFechaLimite().after(fechaActuarl) || q.getFechaLimite().equals(fechaActuarl)) {
@@ -111,6 +131,15 @@ public class QuinielaService {
 	}
 
 	public void calcularAciertos(Quiniela q) {
+		
+		String soyAdministrador = "";
+		Administrator admin = administratorService.findByPrincipal();
+		Collection<Authority> autoridades = admin.getUserAccount().getAuthorities();
+		for(Authority a: autoridades){
+			soyAdministrador = a.getAuthority();
+		}
+		Assert.isTrue(soyAdministrador.equals("ADMINISTRATOR"));
+		
 				
 		Date currentMoment = new Date();
 		Assert.isTrue(q.getFechaLimite().before(currentMoment));
@@ -143,6 +172,47 @@ public class QuinielaService {
 
 	public Quiniela findQuinielaForUsernameAndJornada(String ganador, String jornada) {
 		return quinielaRepository.findQuinielaForUsernameAndJornada(ganador, jornada);
+	}
+
+	public void habilitarQuiniela(int quinielaId) {
+		
+		String soyAdministrador = "";
+		Administrator admin = administratorService.findByPrincipal();
+		Collection<Authority> autoridades = admin.getUserAccount().getAuthorities();
+		for(Authority a: autoridades){
+			soyAdministrador = a.getAuthority();
+		}
+		Assert.isTrue(soyAdministrador.equals("ADMINISTRATOR"));
+
+		
+		Quiniela q = findOneToEdit(quinielaId);
+		q.setValid(true);
+		
+	}
+
+	public void deshabilitarQuiniela(int quinielaId) {
+		
+		String soyAdministrador = "";
+		Administrator admin = administratorService.findByPrincipal();
+		Collection<Authority> autoridades = admin.getUserAccount().getAuthorities();
+		for(Authority a: autoridades){
+			soyAdministrador = a.getAuthority();
+		}
+		Assert.isTrue(soyAdministrador.equals("ADMINISTRATOR"));
+		
+		Quiniela q = findOneToEdit(quinielaId);
+		q.setValid(false);		
+	}
+
+	public void compruebaQueLaQuinielaEstaHabilitada(Quiniela quiniela) {
+		Assert.isTrue(quiniela.isValid());
+		
+	}
+
+	public void compruebaQueLaQuinielaEsDelUsuarioConectado(Quiniela quiniela) {
+		User user = userService.findByPrincipal();
+		Assert.isTrue(user.equals(quiniela.getUser()));
+		
 	}
 
 }

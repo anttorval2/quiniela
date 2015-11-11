@@ -152,6 +152,7 @@ CREATE TABLE `Quiniela` (
   `fechaLimite` date DEFAULT NULL,
   `jornada` varchar(255) DEFAULT NULL,
   `numAciertos` int(11) DEFAULT NULL,
+  `valid` bit(1) NOT NULL,
   `id` int(11) NOT NULL,
   `administrator_id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
@@ -281,6 +282,6 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-10-09 18:37:34
+-- Dump completed on 2015-11-11 20:42:29
 
 commit;

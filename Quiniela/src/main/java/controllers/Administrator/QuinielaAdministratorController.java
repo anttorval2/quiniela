@@ -25,123 +25,148 @@ import services.UserService;
 @RequestMapping("/quiniela/administrator")
 public class QuinielaAdministratorController extends AbstractController {
 
-    // Services -----------------------------------------------------------
+	// Services -----------------------------------------------------------
 
-    @Autowired
-    private QuinielaService quinielaService;
-  
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private QuinielaService quinielaService;
+
+	@Autowired
+	private UserService userService;
 
 	@Resource
 	private MailService mailService;
+
+	// Constructors -----------------------------------------------------------
+
+	public QuinielaAdministratorController() {
+		super();
+	}
+
+	// List........................
+
+	// Muestra un listado de todas las quinielas
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public ModelAndView list() {
+
+		ModelAndView result;
+		Collection<Quiniela> quinielas;
+
+		quinielas = quinielaService.findMyQuinielas();
+
+		result = new ModelAndView("quiniela/list");
+		result.addObject("quinielas", quinielas);
+		result.addObject("canCreate", true);
+
+		result.addObject("requestURI", "quiniela/administrator/list.do");
+
+		return result;
+	}
+
+	// Muestra un listado de todas las quinielas de un usuario
+	@RequestMapping(value = "/list2", method = RequestMethod.GET)
+	public ModelAndView list2(@RequestParam int userId) {
+
+		ModelAndView result;
+		Collection<Quiniela> quinielas;
+
+		User user = userService.findOne(userId);
+
+		quinielas = quinielaService.findQuinielasForUser(user);
+
+		result = new ModelAndView("quiniela/list");
+		result.addObject("quinielas", quinielas);
+		result.addObject("esQuinielaUsuario", true);
+
+		result.addObject("requestURI", "quiniela/administrator/list2.do");
+
+		return result;
+	}
+
+	// habilitar el recuento en esta quiniela
+	@RequestMapping(value = "/habilitar", method = RequestMethod.GET)
+	public ModelAndView habilitar(@RequestParam int quinielaId, @RequestParam int userId) {
+
+		ModelAndView result;
+		
+		quinielaService.habilitarQuiniela(quinielaId);
+
+		result = new ModelAndView("redirect:list2.do?userId="+userId);
+		
+		return result;
+	}
 	
-    // Constructors -----------------------------------------------------------
+	// deshabilitar el recuento en esta quiniela
+	@RequestMapping(value = "/deshabilitar", method = RequestMethod.GET)
+	public ModelAndView deshabilitar(@RequestParam int quinielaId, @RequestParam int userId) {
 
-    public QuinielaAdministratorController() {
-        super();
-    }
+		ModelAndView result;
+		
+		quinielaService.deshabilitarQuiniela(quinielaId);
 
-    // List........................
+		result = new ModelAndView("redirect:list2.do?userId="+userId);
+		
+		return result;
+	}
 
-    //Muestra un listado de todas las quinielas
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ModelAndView list() {
+	@RequestMapping(value = "/crear", method = RequestMethod.GET)
+	public ModelAndView crear() {
 
-        ModelAndView result;
-        Collection<Quiniela> quinielas;
+		ModelAndView result;
 
-        quinielas = quinielaService.findMyQuinielas();
+		Quiniela quiniela;
 
-        result = new ModelAndView("quiniela/list");
-        result.addObject("quinielas", quinielas);
-        result.addObject("canCreate", true);
+		quiniela = quinielaService.create();
 
-        result.addObject("requestURI", "quiniela/administrator/list.do");
+		result = createEditModelAndView(quiniela);
 
-        return result;
-    }
-    
-    //Muestra un listado de todas las quinielas de un usuario
-    @RequestMapping(value = "/list2", method = RequestMethod.GET)
-    public ModelAndView list2(@RequestParam int userId) {
+		result.addObject("quiniela", quiniela);
 
-        ModelAndView result;
-        Collection<Quiniela> quinielas;
-        
-        User user = userService.findOne(userId);
+		return result;
+	}
 
-        quinielas = quinielaService.findQuinielasForUser(user);
+	@RequestMapping(value = "/edit", method = RequestMethod.POST, params = "save")
+	public ModelAndView save(@Valid Quiniela quiniela, BindingResult binding) {
 
-        result = new ModelAndView("quiniela/list");
-        result.addObject("quinielas", quinielas);
-        result.addObject("requestURI", "quiniela/administrator/list2.do");
+		ModelAndView result;
 
-        return result;
-    }
+		if (binding.hasErrors()) {
+			result = createEditModelAndView(quiniela);
+		} else {
+			try {
+				quinielaService.save(quiniela);
+				result = new ModelAndView("redirect:list.do");
+			} catch (Throwable oops) {
+				result = createEditModelAndView(quiniela, "quiniela.commit.error");
+			}
+		}
 
-         
-    @RequestMapping(value = "/crear", method = RequestMethod.GET)
-    public ModelAndView crear() {
+		return result;
 
-        ModelAndView result;
+	}
 
-        Quiniela quiniela;
+	// Ancillary methods ------------------------------------------------------
 
-        quiniela = quinielaService.create();
+	protected ModelAndView createEditModelAndView(Quiniela quiniela) {
+		assert quiniela != null;
+		ModelAndView result;
 
-        result = createEditModelAndView(quiniela);
+		result = createEditModelAndView(quiniela, null);
 
-        result.addObject("quiniela", quiniela);
+		return result;
+	}
 
+	protected ModelAndView createEditModelAndView(Quiniela quiniela, String message) {
 
-        return result;
-    }
+		Assert.notNull(quiniela);
+		ModelAndView result;
 
-    @RequestMapping(value = "/edit", method = RequestMethod.POST, params = "save")
-    public ModelAndView save(@Valid Quiniela quiniela, BindingResult binding) {
+		result = new ModelAndView("quiniela/edit");
 
-        ModelAndView result;
+		result.addObject("quiniela", quiniela);
+		result.addObject("requestURI", "quiniela/administrator/edit.do?quinielaId=" + quiniela.getId());
+		result.addObject("message", message);
 
-        if (binding.hasErrors()) {
-            result = createEditModelAndView(quiniela);
-        } else {
-            try {
-            	quinielaService.save(quiniela);
-                result = new ModelAndView("redirect:list.do");
-            } catch (Throwable oops) {
-                result = createEditModelAndView(quiniela, "quiniela.commit.error");
-            }
-        }
-
-        return result;
-
-    }
-
-    // Ancillary methods ------------------------------------------------------
-
-    protected ModelAndView createEditModelAndView(Quiniela quiniela) {
-        assert quiniela != null;
-        ModelAndView result;
-
-        result = createEditModelAndView(quiniela, null);
-
-        return result;
-    }
-
-    protected ModelAndView createEditModelAndView(Quiniela quiniela, String message) {
-
-        Assert.notNull(quiniela);
-        ModelAndView result;
-
-        result = new ModelAndView("quiniela/edit");
-
-        result.addObject("quiniela", quiniela);
-        result.addObject("requestURI", "quiniela/administrator/edit.do?quinielaId=" + quiniela.getId());
-        result.addObject("message", message);
-
-
-        return result;
-    }
+		return result;
+	}
 
 }

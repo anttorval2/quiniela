@@ -27,25 +27,6 @@
 		<display:column property="resultado" title="${resultado}"
 			sortable="${true}" />
 
-		<%-- 		<security:authorize access="hasRole('ADMINISTRATOR')">
-			<jstl:if test="${canEdit==true}">
-				<display:column>
-					<a href="partido/administrator/edit.do?partidoId=${row.id}"><spring:message
-							code="partido.edit" /></a>
-				</display:column>
-			</jstl:if>
-		</security:authorize> --%>
-
-		<%-- 		<security:authorize access="hasRole('USER')">
-			<jstl:if test="${canEdit==true}">
-				<display:column>
-					<a href="partido/user/edit.do?partidoId=${row.id}"><spring:message
-							code="partido.edit" /></a>
-				</display:column>
-			</jstl:if>
-		</security:authorize> --%>
-
-
 	</display:table>
 
 	<security:authorize access="hasRole('USER')">
@@ -64,7 +45,7 @@
 		<br />
 		<br />
 		<div class="col-md-3  col-md-offset-4">
-			<jstl:if test="${canEdit==true}">
+			<jstl:if test="${canEdit==true && sinPronosticosAun==true}">
 				<div class="row">
 					<a href="partido/user/edit.do?quinielaId=${quinielaId}">
 						<button type="button" class="btn btn-default btn-lg btn-block">
@@ -94,7 +75,7 @@
 			<div class="row">
 				<a href="partido/administrator/edit.do?quinielaId=${quinielaId}">
 					<button type="button" class="btn btn-default btn-lg btn-block">
-						<spring:message code="partido.crearPronosticos" />
+						<spring:message code="partido.crearPronosticos2" />
 					</button>
 				</a>
 			</div>

@@ -269,7 +269,7 @@ public class PartidoAdministratorController extends AbstractController {
         } else {
             try {
             	for(Partido partido: p.getPrueba()){
-            		partidoService.save2(partido);
+            		partidoService.save3(partido);
             	}
             	
                 result = new ModelAndView("redirect:list.do?quinielaId="+p.getPrueba().get(0).getQuiniela().getId());

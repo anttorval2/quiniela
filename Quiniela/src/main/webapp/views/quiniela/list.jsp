@@ -20,6 +20,20 @@
 			<display:column>
 				<a href="partido/administrator/list.do?quinielaId=${row.id}">Ver</a>
 			</display:column>
+			
+			<jstl:if test="${esQuinielaUsuario == true}">
+			<jstl:if test="${row.valid == false}">
+			<display:column>
+				<a href="quiniela/administrator/habilitar.do?quinielaId=${row.id}&userId=${row.user.id}">Habilitar</a>
+			</display:column>
+			</jstl:if>
+			<jstl:if test="${row.valid == true}">
+			<display:column>
+				<a href="quiniela/administrator/deshabilitar.do?quinielaId=${row.id}&userId=${row.user.id}">Deshabilitar</a>
+			</display:column>
+			</jstl:if>
+			</jstl:if>
+			
 		</security:authorize>
 		<security:authorize access="hasRole('USER')">
 			<display:column>
